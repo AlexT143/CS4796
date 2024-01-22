@@ -33,7 +33,7 @@ X_train, y_train, X_test, y_test, train_size = train_test_split(X, y, 0.8)
 # Model parameters
 d_model = 12 # The dimensionality of the output space of the Dense layers/embeddings
 num_heads = 4  # Number of attention heads
-dff = 48  # Dimensionality of the inner layers of the feedforward networks
+dff = 6  # Dimensionality of the inner layers of the feedforward networks
 dropout_rate = 0.1  # Dropout rate
 num_decoder_layers = 2  # Number of decoder layers
 
