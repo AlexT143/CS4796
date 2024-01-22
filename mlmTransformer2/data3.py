@@ -1,26 +1,26 @@
 import yfinance as yf
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+import numpy as np
+import tensorflow as tf
 
-#Boeing stock
+# Download Boeing stock data
 ticker = "BA"
 data = yf.download(ticker)
 
-from sklearn.preprocessing import MinMaxScaler
-import numpy as np
+# Purging - removing data older than 2 years
+purge_date = pd.Timestamp('today') - pd.DateOffset(years=2)
+data = data[data.index >= purge_date]
 
-import tensorflow as tf
+# Embargoing - excluding the most recent 5 days
+embargo_days = 5
+data = data[:-embargo_days]
 
-# Assume 'data' is your DataFrame from yfinance
+# Scaling the data
 scaler = MinMaxScaler()
-
-print(data[:1])
 scaled_data = scaler.fit_transform(data)
 
-# Printing the first few rows of the scaled data (as a NumPy array)
-print(scaled_data[:1])  # This prints the first 5 rows
-
-actual = scaler.inverse_transform(scaled_data)
-print(actual[:1])
-
+# Define a function to create sequences
 def create_sequences(data, seq_length):
     xs, ys = [], []
     for i in range(len(data)-seq_length):
@@ -30,15 +30,15 @@ def create_sequences(data, seq_length):
         ys.append(y)
     return np.array(xs), np.array(ys)
 
+# Create sequences with a specified length
 seq_length = 16  # Length of the sequence
 X, y = create_sequences(scaled_data, seq_length)
 
-
-
-# Splitting the data
+# Splitting the data into training and testing sets
 train_size = int(len(X) * 0.7)
 X_train, X_test = X[:train_size], X[train_size:]
 y_train, y_test = y[:train_size], y[train_size:]
+
 
 
 
@@ -175,7 +175,7 @@ class TransformerDecoderLayer(tf.keras.layers.Layer):
         out3 = self.layernorm3(ffn_output + out2)
 
         return out3, attn_weights_block1, attn_weights_block2
- # Modify the model building function to include a decoder
+
 def build_transformer(input_shape, d_model, num_heads, dff, num_decoder_layers, rate=0.1):
     inputs = tf.keras.Input(shape=input_shape)
     x = tf.keras.layers.Dense(d_model)(inputs)
@@ -230,6 +230,8 @@ predictions = transformer.predict(X_test)
 inverse_scaled_predictions = scaler.inverse_transform(predictions)
 
 print(inverse_scaled_predictions[:5])
+
+actual = scaler.inverse_transform(scaled_data)
 
 # Plot the predictions for closing vs the actual values for closing
 import matplotlib.pyplot as plt
