@@ -4,7 +4,6 @@ import numpy as np
 import joblib
 import yfinance as yf
 
-import os
 
 from BaseTransformerModules.transformer import Transformer
 from BaseTransformerModules.attention import MultiHeadAttention

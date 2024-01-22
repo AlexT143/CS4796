@@ -5,7 +5,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
-from BaseTransformer.BaseTransformerUse.trainBaseTSF import X_train, X_test, y_train, y_test, train_size, scaled_data
+from BaseTransformerUse.trainBaseTSF import X_train, X_test, y_train, y_test, train_size, scaled_data
 from BaseTransformerModules.hyperparameters import SEQ_LENGTH
 from BaseTransformerModules.utils import moving_average
 from BaseTransformerModules.attention_mechanism import BaseMultiHeadAttention
