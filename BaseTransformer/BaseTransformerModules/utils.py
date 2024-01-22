@@ -17,6 +17,44 @@ def scale_data(data):
     scaler = MinMaxScaler()
     return scaler.fit_transform(data), scaler
 
+# def scale_data(data, online, window_size=100):
+#     """ Scale data using MinMaxScaler or Online Normalization and return parameters for unscaling. """
+    
+#     def online_normalize(data, window_size):
+#         # Initialize arrays to store normalized data and parameters for unscaling
+#         normalized_data = np.zeros_like(data, dtype=float)
+#         parameters = []
+        
+#         # Iterate through the data
+#         for i in range(len(data)):
+#             # Determine the window
+#             start = max(0, i - window_size + 1)
+#             end = i + 1
+            
+#             # Calculate mean and std for the window
+#             window_mean = np.mean(data[start:end])
+#             window_std = np.std(data[start:end])
+            
+#             # Normalize the current data point
+#             if window_std != 0:
+#                 normalized_data[i] = (data[i] - window_mean) / window_std
+#                 parameters.append((window_mean, window_std))
+#             else:
+#                 normalized_data[i] = 0  # Avoid division by zero
+#                 parameters.append((window_mean, 1))  # To avoid division by zero later
+        
+#         return normalized_data, parameters
+
+#     if online:
+#         # Online normalization
+#         normalized_data, params = online_normalize(data, window_size)
+#         return normalized_data, params
+#     else:
+#         # Traditional MinMaxScaler normalization
+#         scaler = MinMaxScaler()
+#         normalized_data = scaler.fit_transform(data.reshape(-1, 1)).flatten()
+#         return normalized_data, scaler
+    
 def create_sequences(data, seq_length):
     """ Create sequences from the data. """
     xs, ys = [], []

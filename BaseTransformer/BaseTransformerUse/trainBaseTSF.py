@@ -15,11 +15,11 @@ import yfinance as yf
 import joblib
 
 # Download stock data
-data = yf.download("BA")
+data = yf.download("BA", start="2015-01-01")
 
 # Apply purging and embargoing
-data = purge_data(data, 2) # Purge data older than 2 years
-data = embargo_data(data, 5) # Embargo the most recent 5 days
+#data = purge_data(data, 2) # Purge data older than 2 years
+data = embargo_data(data, SEQ_LENGTH) # Embargo the most recent 5 days
 
 # Scale data
 scaled_data, scaler = scale_data(data)
@@ -49,11 +49,11 @@ transformer.compile(optimizer=tf.keras.optimizers.legacy.Adam(), loss='mse')
 
 transformer.summary()
 
-history = transformer.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test))
+history = transformer.fit(X_train, y_train, epochs=20, batch_size=32, validation_data=(X_test, y_test))
 
 test_loss = transformer.evaluate(X_test, y_test)
 print(f"Test Loss: {test_loss}")
 
 # Using a relative path
-transformer.save("models/baseTSF")
+transformer.save("models/baseTSF/model")
 joblib.dump(scaler, "models/baseTSF/scaler.save")

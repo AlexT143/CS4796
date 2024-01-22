@@ -19,7 +19,7 @@ custom_objects = {
     'MultiHeadAttention': BaseMultiHeadAttention
 }
 
-transformer = tf.keras.models.load_model("models/baseTSF", custom_objects=custom_objects)
+transformer = tf.keras.models.load_model("models/baseTSF", compile=True)
 
 # Load the MinMaxScaler
 scaler = joblib.load("models/baseTSF/scaler.save")
@@ -73,8 +73,8 @@ buy_signals_pred = (short_term_ma_pred[:-1] < long_term_ma_pred[:-1]) & (short_t
 sell_signals_pred = (short_term_ma_pred[:-1] > long_term_ma_pred[:-1]) & (short_term_ma_pred[1:] < long_term_ma_pred[1:])
 
 # Adjust the length of the signal arrays
-buy_signals_pred_adjusted = np.append([False], buy_signals_pred)  # Add False at the beginning
-sell_signals_pred_adjusted = np.append([False], sell_signals_pred)  # Add False at the beginning
+buy_signals_pred_adjusted = np.append([False], buy_signals_pred)  
+sell_signals_pred_adjusted = np.append([False], sell_signals_pred) 
 
 # Plotting
 plt.figure(figsize=(15, 7))
