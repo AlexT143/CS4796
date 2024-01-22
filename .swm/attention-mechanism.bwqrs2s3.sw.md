@@ -1,11 +1,15 @@
 ---
 title: Attention Mechanism
 ---
+Custom-built TensorFlow layer for&nbsp;
+
 <SwmSnippet path="/BaseTransformer/BaseTransformerModules/attention_mechanism.py" line="4">
 
 ---
 
-&nbsp;
+In setting up the necessary components for the multi-head attention mechanism, we specify num_heads (number of heads that are run in p and d_model,&nbsp;
+
+<SwmToken path="/BaseTransformer/BaseTransformerModules/attention_mechanism.py" pos="20:3:3" line-data="    def split_heads(self, x, batch_size):">`split_heads`</SwmToken>  reshapes and transposes the inputs so that the multi-head attention mechanism can be applied. It reshapes the input tensor `x` into a shape that separates the heads, then transposes it for further processing.
 
 ```python
 class BaseMultiHeadAttention(tf.keras.layers.Layer):
@@ -33,11 +37,19 @@ class BaseMultiHeadAttention(tf.keras.layers.Layer):
 
 </SwmSnippet>
 
+ddd
+
 <SwmSnippet path="/BaseTransformer/BaseTransformerModules/attention_mechanism.py" line="24">
 
 ---
 
 &nbsp;
+
+&nbsp;
+
+### **Output**
+
+The function returns the output of the attention layer and the attention weights themselves. The output is the transformed input following the attention mechanism, and the attention weights indicate the importance given to each part of the input sequence.
 
 ```python
     def call(self, v, k, q, mask):

@@ -55,7 +55,9 @@ This unintended data leak can be solved through \[\[Purging\]\] and \[\[Embargoi
 
 Nonetheless, large amount of data is required in training a data-hungry transformer with minimum overfitting issue
 
-	- \[\[Federated Learning (FL)\]\]
+```
+- \[\[Federated Learning (FL)\]\]
+```
 
 &nbsp;
 
