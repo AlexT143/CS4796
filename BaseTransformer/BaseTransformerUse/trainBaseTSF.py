@@ -57,7 +57,7 @@ def main():
         rate=dropout_rate,
         attention_ar_order=1,
         attention_ma_order=1,
-        attention_mechanism='base'
+        attention_mechanism='arima'
     )
     transformer.compile(optimizer=tf.keras.optimizers.legacy.Adam(), loss='mse')
 
