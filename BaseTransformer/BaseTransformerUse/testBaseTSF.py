@@ -5,24 +5,23 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
-from BaseTransformerUse.trainBaseTSF import X_train, X_test, y_train, y_test, train_size, scaled_data
 from BaseTransformerModules.hyperparameters import SEQ_LENGTH
 from BaseTransformerModules.utils import moving_average
-from BaseTransformerModules.attention_mechanism import BaseMultiHeadAttention
 
 import tensorflow as tf
 import numpy as np
+import pickle
 
-import joblib
-
-custom_objects = {
-    'MultiHeadAttention': BaseMultiHeadAttention
-}
-
-transformer = tf.keras.models.load_model("models/baseTSF", compile=True)
+# Load the trained model
+transformer = tf.keras.models.load_model("models/baseTSF/model")
 
 # Load the MinMaxScaler
-scaler = joblib.load("models/baseTSF/scaler.save")
+with open("models/baseTSF/scaler.pkl", "rb") as file:
+    scaler = pickle.load(file)
+
+# Load the necessary variables
+with open("models/baseTSF/variables.pkl", "rb") as file:
+    X_test, scaled_data, train_size = pickle.load(file)
 
 # After training, make predictions
 predictions = transformer.predict(X_test)
@@ -41,7 +40,6 @@ plt.plot(inverse_scaled_predictions[:, 3], label='Predicted')
 plt.plot(actual[train_size + SEQ_LENGTH:, 3], label='Actual')
 plt.legend()
 plt.show()
-
 
 # Prepare the most recent sequence
 latest_sequence = scaled_data[-SEQ_LENGTH:]
@@ -116,5 +114,4 @@ for i in range(len(buy_signals_pred_adjusted)):
 if holdings > 0:
     capital = holdings * inverse_scaled_predictions[-1, 3]  # Final day's price
 
-print(f"Final capital: {capital}")
-
+print(f"Final capital: {capital}") 

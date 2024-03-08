@@ -11,18 +11,20 @@ from BaseTransformerModules.decoder import TransformerDecoderLayer
 
 import tensorflow as tf
 
-def build_transformer(input_shape, d_model, num_heads, dff, num_decoder_layers, rate=0.1):
+def build_transformer(input_shape, d_model, num_heads, dff, num_encoder_layers=1, num_decoder_layers=0, rate=0.1, attention_ar_order=1, attention_ma_order=1, attention_mechanism='base'):
     inputs = tf.keras.Input(shape=input_shape)
     x = tf.keras.layers.Dense(d_model)(inputs)
 
     pos_encoding = positional_encoding(input_shape[0], d_model)
     x += pos_encoding[:, :input_shape[0], :]
 
-    encoder_output = TransformerEncoderLayer(d_model, num_heads, dff, rate)(x, training=False, mask=None)
+    encoder_output = x
+    for _ in range(num_encoder_layers):
+        encoder_output = TransformerEncoderLayer(d_model, num_heads, dff, rate)(encoder_output, training=False, mask=None)
 
     decoder_output = encoder_output
     for _ in range(num_decoder_layers):
-        decoder_output, _, _ = TransformerDecoderLayer(d_model, num_heads, dff, rate)(
+        decoder_output, _, _ = TransformerDecoderLayer(d_model, num_heads, dff, rate, attention_ar_order, attention_ma_order, attention_mechanism)(
             decoder_output, encoder_output, training=False, look_ahead_mask=None, padding_mask=None)
 
     x = tf.keras.layers.Flatten()(encoder_output)

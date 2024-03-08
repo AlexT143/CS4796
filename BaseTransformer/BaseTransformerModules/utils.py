@@ -75,6 +75,14 @@ def get_angles(pos, i, d_model):
     angle_rates = 1 / np.power(10000, (2 * (i//2)) / np.float32(d_model))
     return pos * angle_rates
 
+def calculate_log_returns(data):
+    log_returns = np.log(data / data.shift(1))
+    log_returns.drop(log_returns.index[0], inplace=True)
+    return log_returns
+
+def zero_mean_normalize(data):
+    return (data - data.mean()) / data.std()
+
 def positional_encoding(position, d_model):
     angle_rads = get_angles(np.arange(position)[:, np.newaxis],
                             np.arange(d_model)[np.newaxis, :],
@@ -89,6 +97,24 @@ def positional_encoding(position, d_model):
     pos_encoding = angle_rads[np.newaxis, ...]
     
     return tf.cast(pos_encoding, dtype=tf.float32)
+
+# def periodic_positional_encoding(position, d_model, periodicity, num_periods):
+#     angle_rates = 1 / np.power(10000, (2 * (np.arange(d_model)[:, np.newaxis] // 2)) / np.float32(d_model))
+#     angle_rates_periodic = angle_rates * periodicity
+
+#     angle_rads = np.outer(position % periodicity, angle_rates_periodic[:, 0])
+#     angle_rads[:, 0::2] = np.sin(angle_rads[:, 0::2])
+#     angle_rads[:, 1::2] = np.cos(angle_rads[:, 1::2])
+
+#     season_encoding = np.zeros((num_periods, d_model), dtype=np.float32)
+#     for i in range(num_periods):
+#         season_encoding[i, :] = angle_rads[i * periodicity, :]
+
+#     pos_encoding = angle_rads[np.newaxis, ...]
+#     season_index = (position // periodicity) % num_periods
+#     pos_encoding += season_encoding[season_index, np.newaxis, :]
+
+#     return tf.cast(pos_encoding, dtype=tf.float32)
 
 def moving_average(data, window_size):
     """ Returns the moving average of the given data. """

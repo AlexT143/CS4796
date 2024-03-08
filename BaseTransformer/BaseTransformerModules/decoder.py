@@ -6,15 +6,23 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
 from BaseTransformerModules.attention_mechanism import BaseMultiHeadAttention
+from CustomTransformerModules.ArimaInspiredMultiHeadAttention import ArimaInspiredMultiHeadAttention
 
 import tensorflow as tf
 
 class TransformerDecoderLayer(tf.keras.layers.Layer):
-    def __init__(self, d_model, num_heads, dff, rate=0.1):
+    def __init__(self, d_model, num_heads, dff, rate=0.1, ar_order=1, ma_order=1, attention_mechanism='base'):
         super(TransformerDecoderLayer, self).__init__()
 
-        self.mha1 = BaseMultiHeadAttention(d_model, num_heads)
-        self.mha2 = BaseMultiHeadAttention(d_model, num_heads)
+        if attention_mechanism == 'base':
+            print('Using base attention mechanism in decoder')
+            self.mha1 = BaseMultiHeadAttention(d_model, num_heads)
+            self.mha2 = BaseMultiHeadAttention(d_model, num_heads)
+        elif attention_mechanism == 'arima':
+            print('Using ARIMA-inspired attention mechanism in decoder with AR order of', ar_order, 'and MA order of', ma_order)
+            self.mha1 = ArimaInspiredMultiHeadAttention(d_model, num_heads, ar_order, ma_order)
+            self.mha2 = ArimaInspiredMultiHeadAttention(d_model, num_heads, ar_order, ma_order)
+        
 
         self.ffn = tf.keras.Sequential([
             tf.keras.layers.Dense(dff, activation='relu'),
