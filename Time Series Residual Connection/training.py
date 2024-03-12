@@ -10,7 +10,7 @@ sys.path.insert(0, parent_dir)
 
 from VanillaTransformerComponents.transformer import build_transformer
 from VanillaTransformerComponents.hyperparameters import SEQ_LENGTH
-from time_series_models import (
+from VanillaTransformerComponents.utils import (
     train_arima,
     train_exponential_smoothing,
     get_arima_forecast,
@@ -21,11 +21,10 @@ root_dir = os.path.dirname(parent_dir)
 sys.path.insert(0, root_dir)
 
 from data_preprocessing import preprocess_data
-from evaluation_metrics import calculate_metrics
 
 
 def train_and_save_model(
-    epochs, batch_size, residual_connection_type, use_arima, use_es
+    epochs, batch_size, residual_connection_type, use_arima, use_es, model_type
 ):
     # Preprocess the data
     X_train, y_train, X_test, y_test, scaler, scaled_data, train_size = (
@@ -90,7 +89,7 @@ def train_and_save_model(
     print(f"Test MSE: {mse:.4f}, Test MAE: {mae:.4f}, Test MAPE: {mape:.4f}")
 
     # Save the model
-    model_dir = f"models/residual_{residual_connection_type}_arima_{use_arima}_es_{use_es}"
+    model_dir = f"models/{model_type}_residual_{residual_connection_type}_arima_{use_arima}_es_{use_es}"
     os.makedirs(model_dir, exist_ok=True)
     tf.keras.models.save_model(transformer, f"{model_dir}/model")
 
@@ -108,56 +107,22 @@ def train_and_save_model(
 def main():
     epochs = 20
     batch_size = 32
-    residual_connection_types = ["vanilla", "time_series"]
-    use_arima_options = [True, False]
-    use_es_options = [True, False]
-    num_runs = (
-        5  # Number of times to run the training and evaluation for each combination
-    )
+    model_configs = {
+        "involatile": {"residual_connection_type": "vanilla", "use_arima": True, "use_es": False},
+        "volatile": {"residual_connection_type": "time_series", "use_arima": False, "use_es": True},
+        "inline": {"residual_connection_type": "time_series", "use_arima": True, "use_es": True},
+    }
 
-    results = []
+    for model_type, config in model_configs.items():
+        print(f"Training {model_type} model")
+        residual_connection_type = config["residual_connection_type"]
+        use_arima = config["use_arima"]
+        use_es = config["use_es"]
 
-    for residual_connection_type in residual_connection_types:
-        for use_arima in use_arima_options:
-            for use_es in use_es_options:
-                print(
-                    f"Training with Residual Connection Type: {residual_connection_type}, Use ARIMA: {use_arima}, Use ES: {use_es}"
-                )
-                mse_list, mae_list, mape_list = [], [], []
-                for run in range(num_runs):
-                    print(f"Run {run + 1}/{num_runs}")
-                    mse, mae, mape = train_and_save_model(
-                        epochs, batch_size, residual_connection_type, use_arima, use_es
-                    )
-                    mse_list.append(mse)
-                    mae_list.append(mae)
-                    mape_list.append(mape)
-                avg_mse = np.mean(mse_list)
-                avg_mae = np.mean(mae_list)
-                avg_mape = np.mean(mape_list)
-                results.append(
-                    {
-                        "Residual Connection Type": residual_connection_type,
-                        "Use ARIMA": use_arima,
-                        "Use ES": use_es,
-                        "Average MSE": avg_mse,
-                        "Average MAE": avg_mae,
-                        "Average MAPE": avg_mape,
-                    }
-                )
-
-    for result in results:
-        print(result)
-
-    best_result = min(results, key=lambda x: x["Average MSE"])
-    print(f"Best Configuration: {best_result}")
-
-    # Train and save the best model
-    print("Training and saving the best model...")
-    residual_connection_type = best_result["Residual Connection Type"]
-    use_arima = best_result["Use ARIMA"]
-    use_es = best_result["Use ES"]
-    train_and_save_model(epochs, batch_size, residual_connection_type, use_arima, use_es)
+        mse, mae, mape = train_and_save_model(
+            epochs, batch_size, residual_connection_type, use_arima, use_es, model_type
+        )
+        print(f"Test MSE: {mse:.4f}, Test MAE: {mae:.4f}, Test MAPE: {mape:.4f}")
 
 
 if __name__ == "__main__":

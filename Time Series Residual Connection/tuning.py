@@ -9,7 +9,7 @@ sys.path.insert(0, parent_dir)
 
 from VanillaTransformerComponents.transformer import build_transformer
 from VanillaTransformerComponents.hyperparameters import SEQ_LENGTH
-from time_series_models import (
+from VanillaTransformerComponents.utils import (
     train_arima,
     train_exponential_smoothing,
     get_arima_forecast,
@@ -20,29 +20,30 @@ root_dir = os.path.dirname(parent_dir)
 sys.path.insert(0, root_dir)
 
 from data_preprocessing import preprocess_data
-from evaluation_metrics import calculate_metrics
 
 
 def train_and_evaluate_model(
     epochs, batch_size, residual_connection_type, use_arima, use_es
 ):
-    # Preprocess the data
+    print("Preprocessing data...")
     X_train, y_train, X_test, y_test, scaler, scaled_data, train_size = (
         preprocess_data()
     )
 
-    # Train traditional time series models
+    print("Training ARIMA models...")
     arima_models = train_arima(X_train)
+    print("Training Exponential Smoothing models...")
     es_models = train_exponential_smoothing(
         X_train, freq="D"
     )  # Assuming daily frequency
 
-    # Get forecasts from traditional models
+    print("Getting ARIMA forecasts...")
     arima_forecast = (
         get_arima_forecast(arima_models, SEQ_LENGTH, X_train) if use_arima else None
     )
+    print("Getting Exponential Smoothing forecasts...")
     es_forecast = get_es_forecast(es_models, SEQ_LENGTH) if use_es else None
-
+    
     # Model parameters
     d_model = (
         12  # The dimensionality of the output space of the Dense layers/embeddings
@@ -84,11 +85,11 @@ def train_and_evaluate_model(
     )
 
     y_pred = transformer.predict(X_test)
-    mse, mae, mape = calculate_metrics(y_test, y_pred)
+    # mse, mae, mape = calculate_metrics(y_test, y_pred)
 
-    print(f"Test MSE: {mse:.4f}, Test MAE: {mae:.4f}, Test MAPE: {mape:.4f}")
+    # print(f"Test MSE: {mse:.4f}, Test MAE: {mae:.4f}, Test MAPE: {mape:.4f}")
 
-    return mse, mae, mape
+    # return mse, mae, mape
 
 
 def main():

@@ -74,8 +74,7 @@ def train_and_evaluate_model(epochs, batch_size, num_encoder_layers, num_decoder
 def main():
     epochs = 10
     batch_size = 32
-    num_encoder_layers_list = [1, 2]
-    num_decoder_layers_list = [1, 2]
+ 
     d_model_list = [12, 24, 36]
     num_heads_list = [4, 8, 12]
     dff_list = [6, 12, 18]
@@ -104,9 +103,9 @@ def main():
                                 
                                 losses.append(loss)
 
-                                # # Calculate permutation feature importance
-                                # feature_importance = calculate_permutation_feature_importance(transformer, X_test, y_test, scaler)
-                                # feature_importances.append(feature_importance)
+                                # Calculate permutation feature importance
+                                feature_importance = calculate_permutation_feature_importance(transformer, X_test, y_test, scaler)
+                                feature_importances.append(feature_importance)
 
                             if transformer is None:
                                 continue

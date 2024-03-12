@@ -1,5 +1,6 @@
 import os
 import sys
+import pickle
 import numpy as np
 import tensorflow as tf
 
@@ -15,7 +16,7 @@ sys.path.insert(0, root_dir)
 
 from data_preprocessing import preprocess_data
 
-def train_and_evaluate_model(epochs, batch_size, alpha):
+def train_and_save_model(epochs, batch_size, alpha, model_type):
     # Preprocess the data
     X_train, y_train, X_test, y_test, scaler, scaled_data, train_size = preprocess_data()
 
@@ -53,32 +54,36 @@ def train_and_evaluate_model(epochs, batch_size, alpha):
     )
 
     test_loss = transformer.evaluate(X_test, y_test)
-    print(f"Test Loss for Exponential Smoothing Positional Encoding with alpha {alpha}: {test_loss}")
+    print(f"Test Loss for {model_type} Exponential Smoothing Positional Encoding with alpha {alpha}: {test_loss}")
+
+    # Save the model
+    model_dir = f"models/{model_type}_exponential_smoothing_alpha_{alpha}"
+    os.makedirs(model_dir, exist_ok=True)
+    tf.keras.models.save_model(transformer, f"{model_dir}/model")
+
+    # Save the scaler
+    with open(f"{model_dir}/scaler.pkl", "wb") as file:
+        pickle.dump(scaler, file)
+
+    # Save the necessary variables
+    with open(f"{model_dir}/variables.pkl", "wb") as file:
+        pickle.dump((X_test, scaled_data, train_size), file)
 
     return test_loss
 
 def main():
     epochs = 20
     batch_size = 32
-    alphas = [0.1, 0.3, 0.5, 0.7, 0.9]
-    num_runs = 5 
+    alphas = {
+        "involatile": 0.2,
+        "volatile": 0.8,
+        "inline": 0.5
+    }
 
-    results = {}
-
-    for alpha in alphas:
-        print(f"Training with alpha: {alpha}")
-        losses = []
-        for run in range(num_runs):
-            print(f"Run {run + 1}/{num_runs}")
-            loss = train_and_evaluate_model(epochs, batch_size, alpha)
-            losses.append(loss)
-        avg_loss = np.mean(losses)
-        results[alpha] = avg_loss
-        print(f"Average Test Loss for alpha {alpha}: {avg_loss}")
-
-    best_alpha = min(results, key=results.get)
-    best_loss = results[best_alpha]
-    print(f"Best alpha: {best_alpha}, Best Average Loss: {best_loss}")
+    for model_type, alpha in alphas.items():
+        print(f"Training {model_type} model with alpha {alpha}")
+        test_loss = train_and_save_model(epochs, batch_size, alpha, model_type)
+        print(f"Test Loss for {model_type} model: {test_loss}")
 
 if __name__ == "__main__":
     main()

@@ -75,9 +75,9 @@ def train_and_evaluate_model(epochs, batch_size, num_encoder_layers, num_decoder
 def main():
     epochs = 20
     batch_size = 32
-    num_encoder_layers_list = [3]
-    num_decoder_layers_list = [3]
-    num_runs = 5  # Number of times to run the training and evaluation for each combination
+    num_encoder_layers_list = [0]
+    num_decoder_layers_list = [2, 3, 4]
+    num_runs = 50  # Number of times to run the training and evaluation for each combination
 
     results = {}
 
