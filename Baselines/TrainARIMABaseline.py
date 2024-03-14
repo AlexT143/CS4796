@@ -13,6 +13,7 @@ def train_and_save_auto_arima(data, train_size):
     # Select the fourth column (index 3) for training the auto_arima model
     close_data = data[:, 3]
 
+    print(close_data[:train_size].shape)
     # Train the auto_arima model
     auto_arima_model = auto_arima(close_data[:train_size])
 

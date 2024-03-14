@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import tensorflow as tf
+import csv
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -61,23 +62,48 @@ def main():
     epochs = 20
     batch_size = 32
     alphas = [0.1, 0.3, 0.5, 0.7, 0.9]
-    num_runs = 5 
+    num_runs = 5
 
     results = {}
 
-    for alpha in alphas:
-        print(f"Training with alpha: {alpha}")
-        losses = []
-        for run in range(num_runs):
-            print(f"Run {run + 1}/{num_runs}")
-            loss = train_and_evaluate_model(epochs, batch_size, alpha)
-            losses.append(loss)
-        avg_loss = np.mean(losses)
-        results[alpha] = avg_loss
-        print(f"Average Test Loss for alpha {alpha}: {avg_loss}")
+    models_data_folder = "models_data"
+    if not os.path.exists(models_data_folder):
+        os.makedirs(models_data_folder)
+
+    csv_file = os.path.join(models_data_folder, "exponential_smoothing_results.csv")
+    file_exists = os.path.isfile(csv_file)
+
+    fieldnames = ["run", "alpha", "loss"]
+
+    with open(csv_file, mode="a", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+        if not file_exists:
+            writer.writeheader()
+
+        for alpha in alphas:
+            print(f"Training with alpha: {alpha}")
+            losses = []
+
+            for run in range(num_runs):
+                print(f"Run {run + 1}/{num_runs}")
+                loss = train_and_evaluate_model(epochs, batch_size, alpha)
+                losses.append(loss)
+
+                row = {
+                    "run": run + 1,
+                    "alpha": alpha,
+                    "loss": loss
+                }
+                writer.writerow(row)
+
+            avg_loss = np.mean(losses)
+            results[alpha] = avg_loss
+            print(f"Average Test Loss for alpha {alpha}: {avg_loss}")
 
     best_alpha = min(results, key=results.get)
     best_loss = results[best_alpha]
+
     print(f"Best alpha: {best_alpha}, Best Average Loss: {best_loss}")
 
 if __name__ == "__main__":

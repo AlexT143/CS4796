@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 import tensorflow as tf
+import csv
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -71,19 +72,42 @@ def main():
 
     results = {}
 
-    for ar_order in ar_orders:
-        for ma_order in ma_orders:
-            print(f"Training with AR order: {ar_order}, MA order: {ma_order}")
-            losses = []
+    models_data_folder = "models_data"
+    if not os.path.exists(models_data_folder):
+        os.makedirs(models_data_folder)
 
-            for run in range(num_runs):
-                print(f"Run {run + 1}/{num_runs}")
-                loss = train_and_evaluate_model(epochs, batch_size, ar_order, ma_order)
-                losses.append(loss)
+    csv_file = os.path.join(models_data_folder, "arima_transformer_results.csv")
+    file_exists = os.path.isfile(csv_file)
 
-            avg_loss = np.mean(losses)
-            results[(ar_order, ma_order)] = avg_loss
-            print(f"Average Test Loss for AR order {ar_order} and MA order {ma_order}: {avg_loss}")
+    fieldnames = ["run", "ar_order", "ma_order", "loss"]
+
+    with open(csv_file, mode="a", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+        if not file_exists:
+            writer.writeheader()
+
+        for ar_order in ar_orders:
+            for ma_order in ma_orders:
+                print(f"Training with AR order: {ar_order}, MA order: {ma_order}")
+                losses = []
+
+                for run in range(num_runs):
+                    print(f"Run {run + 1}/{num_runs}")
+                    loss = train_and_evaluate_model(epochs, batch_size, ar_order, ma_order)
+                    losses.append(loss)
+
+                    row = {
+                        "run": run + 1,
+                        "ar_order": ar_order,
+                        "ma_order": ma_order,
+                        "loss": loss
+                    }
+                    writer.writerow(row)
+
+                avg_loss = np.mean(losses)
+                results[(ar_order, ma_order)] = avg_loss
+                print(f"Average Test Loss for AR order {ar_order} and MA order {ma_order}: {avg_loss}")
 
     best_params = min(results, key=results.get)
     best_ar_order, best_ma_order = best_params

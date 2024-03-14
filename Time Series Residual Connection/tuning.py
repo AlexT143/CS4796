@@ -9,12 +9,7 @@ sys.path.insert(0, parent_dir)
 
 from VanillaTransformerComponents.transformer import build_transformer
 from VanillaTransformerComponents.hyperparameters import SEQ_LENGTH
-from VanillaTransformerComponents.utils import (
-    train_arima,
-    train_exponential_smoothing,
-    get_arima_forecast,
-    get_es_forecast,
-)
+from time_series_utils import train_arima, train_exponential_smoothing, get_arima_forecast, get_es_forecast
 
 root_dir = os.path.dirname(parent_dir)
 sys.path.insert(0, root_dir)
