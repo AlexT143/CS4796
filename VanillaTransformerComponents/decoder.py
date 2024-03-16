@@ -6,7 +6,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
 from VanillaTransformerComponents.attention_mechanism import BaseMultiHeadAttention
-from CustomTransformerComponents.ArimaInspiredMultiHeadAttention import ArimaInspiredMultiHeadAttention
+from CustomTransformerComponents.arma_multi_head_attention import ARMAMultiHeadAttention
 from CustomTransformerComponents.VolatilityAwareMultiHeadAttention import VolatilityAwareMultiHeadAttention
 
 import tensorflow as tf
@@ -19,10 +19,10 @@ class TransformerDecoderLayer(tf.keras.layers.Layer):
             print('Using base attention mechanism in decoder')
             self.mha1 = BaseMultiHeadAttention(d_model, num_heads)
             self.mha2 = BaseMultiHeadAttention(d_model, num_heads)
-        elif attention_mechanism == 'arima_inspired':
+        elif attention_mechanism == 'arma':
             print('Using ARIMA-inspired attention mechanism in decoder with AR order of', ar_order, 'and MA order of', ma_order)
-            self.mha1 = ArimaInspiredMultiHeadAttention(d_model, num_heads, ar_order, ma_order)
-            self.mha2 = ArimaInspiredMultiHeadAttention(d_model, num_heads, ar_order, ma_order)
+            self.mha1 = ARMAMultiHeadAttention(d_model, num_heads, ar_order, ma_order)
+            self.mha2 = ARMAMultiHeadAttention(d_model, num_heads, ar_order, ma_order)
         elif attention_mechanism == 'volatility':
             print('Using volatility-aware attention mechanism in decoder')
             self.mha1 = VolatilityAwareMultiHeadAttention(d_model, num_heads, garch_order)

@@ -90,7 +90,7 @@ def main():
     num_encoder_layers = 0
     num_decoder_layers = 8
     d_model_list = [12, 24, 36, 48]
-    num_heads_list = [2, 4, 6, 8]
+    num_heads_list = [4, 6, 8, 12]
     dff_list = [6, 12, 18, 24]
     dropout_rate_list = [0.1, 0.2, 0.3, 0.4]
     num_runs = 10  # Number of times to run the training and evaluation for each combination
@@ -114,7 +114,7 @@ def main():
         if not file_exists:
             writer.writeheader()
 
-        for volatility_type in ["volatile"]:
+        for volatility_type in ["involatile", "volatile", "inline"]:
             for d_model in d_model_list:
                 for num_heads in num_heads_list:
                     for dff in dff_list:

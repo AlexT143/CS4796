@@ -56,7 +56,7 @@ def train_and_save_model(epochs, batch_size, ar_order, ma_order, model_type):
         num_encoder_layers=1,
         num_decoder_layers=1,
         rate=dropout_rate,
-        attention_mechanism="arima_inspired",
+        attention_mechanism="arma",
         positional_encoding_type="vanilla",
         residual_connection_type="vanilla",
         attention_ar_order=ar_order,

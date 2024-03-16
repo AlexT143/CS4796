@@ -17,7 +17,7 @@ class TransformerEncoderLayer(tf.keras.layers.Layer):
         if attention_mechanism == "vanilla":
             print('Using base attention mechanism in encoder')
             self.mha = BaseMultiHeadAttention(d_model, num_heads)
-        elif attention_mechanism == 'arima_inspired':
+        elif attention_mechanism == 'arma':
             print('Using ARIMA-inspired attention mechanism in encoder with AR order of', attention_ar_order, 'and MA order of', attention_ma_order)
             
         self.ffn = tf.keras.Sequential([
